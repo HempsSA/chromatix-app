@@ -32,18 +32,18 @@ const appState = {
   scrollToTrack: false,
 };
 
-const plexUserState = {
+const userState = {
   loggedIn: false,
   currentUser: null,
   allServers: null,
 };
 
-const plexServerState = {
-  plexBaseUrl: null,
+const serverState = {
+  serverBaseUrl: null,
   allLibraries: null,
 };
 
-const plexLibraryState = {
+const libraryState = {
   // artists
   allArtists: null,
   allArtistAlbums: {},
@@ -85,7 +85,7 @@ const plexLibraryState = {
   searchResults: null,
 };
 
-const state = Object.assign({}, appState, plexUserState, plexServerState, plexLibraryState);
+const state = Object.assign({}, appState, userState, serverState, libraryState);
 
 // ======================================================================
 // REDUCERS
@@ -163,9 +163,9 @@ const effects = (dispatch) => ({
     console.log('%c--- setLoggedOut ---', 'color:#07a098');
     dispatch.appModel.setAppState({
       inited: true,
-      ...Object.assign({}, plexUserState),
-      ...Object.assign({}, plexServerState),
-      ...Object.assign({}, plexLibraryState),
+      ...Object.assign({}, userState),
+      ...Object.assign({}, serverState),
+      ...Object.assign({}, libraryState),
     });
     dispatch.playerModel.playerUnload();
     dispatch.sessionModel.setLoggedOut();
@@ -222,19 +222,19 @@ const effects = (dispatch) => ({
   // PLEX SERVERS & LIBRARIES
   //
 
-  clearPlexServerState(payload, rootState) {
-    console.log('%c--- clearPlexServerState ---', 'color:#07a098');
+  clearServerState(payload, rootState) {
+    console.log('%c--- clearServerState ---', 'color:#07a098');
     dispatch.appModel.setAppState({
-      ...Object.assign({}, plexServerState),
-      ...Object.assign({}, plexLibraryState),
+      ...Object.assign({}, serverState),
+      ...Object.assign({}, libraryState),
     });
     dispatch.playerModel.playerUnload();
   },
 
-  clearPlexLibraryState(payload, rootState) {
-    console.log('%c--- clearPlexLibraryState ---', 'color:#07a098');
+  clearLibraryState(payload, rootState) {
+    console.log('%c--- clearLibraryState ---', 'color:#07a098');
     dispatch.appModel.setAppState({
-      ...Object.assign({}, plexLibraryState),
+      ...Object.assign({}, libraryState),
     });
     rootState.appModel.history.push('/');
     plex.getAllPlaylists();

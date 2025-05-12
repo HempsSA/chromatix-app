@@ -113,11 +113,11 @@ export const getAllServers = () => {
 // ======================================================================
 
 const getFastestConnection = async (currentServer) => {
-  let plexBaseUrl;
+  let serverBaseUrl;
   try {
     await plexTools.getFastestConnection(currentServer).then((response) => {
-      plexBaseUrl = response;
-      store.dispatch.appModel.setAppState({ plexBaseUrl });
+      serverBaseUrl = response;
+      store.dispatch.appModel.setAppState({ serverBaseUrl });
     });
   } catch (error) {
     console.error(error);
@@ -125,7 +125,7 @@ const getFastestConnection = async (currentServer) => {
     analyticsEvent('Error: Plex Get Fastest Server Connection');
     throw error;
   }
-  return plexBaseUrl;
+  return serverBaseUrl;
 };
 
 // ======================================================================
@@ -144,9 +144,9 @@ export const getAllLibraries = async () => {
         getUserLibrariesRunning = true;
 
         // before getting libraries, get the fastest server connection
-        let plexBaseUrl;
+        let serverBaseUrl;
         try {
-          plexBaseUrl = await getFastestConnection(currentServer);
+          serverBaseUrl = await getFastestConnection(currentServer);
         } catch (error) {
           getUserLibrariesRunning = false;
           return;
@@ -154,7 +154,7 @@ export const getAllLibraries = async () => {
 
         const accessToken = store.getState().sessionModel.currentServer.accessToken;
         plexTools
-          .getAllLibraries(plexBaseUrl, accessToken)
+          .getAllLibraries(serverBaseUrl, accessToken)
           .then((response) => {
             store.dispatch.sessionModel.refreshCurrentLibrary(response);
             store.dispatch.appModel.setAppState({ allLibraries: response });
@@ -185,11 +185,11 @@ export const getAllArtists = () => {
       console.log('%c--- plex - getAllArtists ---', 'color:#f9743b;');
       getAllArtistsRunning = true;
       const accessToken = store.getState().sessionModel.currentServer.accessToken;
-      const plexBaseUrl = store.getState().appModel.plexBaseUrl;
+      const serverBaseUrl = store.getState().appModel.serverBaseUrl;
       const { libraryId } = store.getState().sessionModel.currentLibrary;
 
       plexTools
-        .getAllArtists(plexBaseUrl, libraryId, accessToken)
+        .getAllArtists(serverBaseUrl, libraryId, accessToken)
         .then((response) => {
           // console.log(response);
           store.dispatch.appModel.setAppState({
@@ -220,10 +220,10 @@ export const getArtistDetails = (libraryId, artistId) => {
       console.log('%c--- plex - getArtistDetails ---', 'color:#f9743b;');
       getArtistDetailsRunning = true;
       const accessToken = store.getState().sessionModel.currentServer.accessToken;
-      const plexBaseUrl = store.getState().appModel.plexBaseUrl;
+      const serverBaseUrl = store.getState().appModel.serverBaseUrl;
 
       plexTools
-        .getArtistDetails(plexBaseUrl, libraryId, artistId, accessToken)
+        .getArtistDetails(serverBaseUrl, libraryId, artistId, accessToken)
         .then((response) => {
           // console.log(response);
           store.dispatch.appModel.storeArtistDetails(response);
@@ -251,10 +251,10 @@ export const getAllArtistAlbums = (libraryId, artistId) => {
       console.log('%c--- plex - getAllArtistAlbums ---', 'color:#f9743b;');
       getAllArtistAlbumsRunning = true;
       const accessToken = store.getState().sessionModel.currentServer.accessToken;
-      const plexBaseUrl = store.getState().appModel.plexBaseUrl;
+      const serverBaseUrl = store.getState().appModel.serverBaseUrl;
 
       plexTools
-        .getAllArtistAlbums(plexBaseUrl, libraryId, artistId, accessToken)
+        .getAllArtistAlbums(serverBaseUrl, libraryId, artistId, accessToken)
         .then((response) => {
           // console.log(response);
           store.dispatch.appModel.storeArtistAlbums({ libraryId, artistId, artistAlbums: response });
@@ -282,10 +282,10 @@ export const getAllArtistRelated = (libraryId, artistId) => {
       console.log('%c--- plex - getAllArtistRelated ---', 'color:#f9743b;');
       getAllArtistRelatedRunning = true;
       const accessToken = store.getState().sessionModel.currentServer.accessToken;
-      const plexBaseUrl = store.getState().appModel.plexBaseUrl;
+      const serverBaseUrl = store.getState().appModel.serverBaseUrl;
 
       plexTools
-        .getAllArtistRelated(plexBaseUrl, libraryId, artistId, accessToken)
+        .getAllArtistRelated(serverBaseUrl, libraryId, artistId, accessToken)
         .then((response) => {
           // console.log(response);
           store.dispatch.appModel.storeArtistRelated({ libraryId, artistId, artistRelated: response });
@@ -313,10 +313,10 @@ export const getAllArtistAppearanceAlbums = (libraryId, artistId, artistName) =>
       console.log('%c--- plex - getAllArtistAppearanceAlbums ---', 'color:#f9743b;');
       getAllArtistAppearanceAlbumsRunning = true;
       const accessToken = store.getState().sessionModel.currentServer.accessToken;
-      const plexBaseUrl = store.getState().appModel.plexBaseUrl;
+      const serverBaseUrl = store.getState().appModel.serverBaseUrl;
 
       plexTools
-        .getAllArtistAppearanceAlbums(plexBaseUrl, libraryId, artistName, store, accessToken)
+        .getAllArtistAppearanceAlbums(serverBaseUrl, libraryId, artistName, store, accessToken)
         .then((response) => {
           // console.log(response);
           store.dispatch.appModel.storeArtistCompilationAlbums({
@@ -348,11 +348,11 @@ export const getAllArtistTracks = (libraryId, artistId, artistName) => {
       console.log('%c--- plex - getAllArtistTracks ---', 'color:#f9743b;');
       getAllArtistTracksRunning = true;
       const accessToken = store.getState().sessionModel.currentServer.accessToken;
-      const plexBaseUrl = store.getState().appModel.plexBaseUrl;
+      const serverBaseUrl = store.getState().appModel.serverBaseUrl;
 
       Promise.all([
-        plexTools.getAllArtistTracks(plexBaseUrl, libraryId, artistId, artistName, accessToken),
-        plexTools.getAllArtistAppearanceTracks(plexBaseUrl, libraryId, artistId, artistName, accessToken),
+        plexTools.getAllArtistTracks(serverBaseUrl, libraryId, artistId, artistName, accessToken),
+        plexTools.getAllArtistAppearanceTracks(serverBaseUrl, libraryId, artistId, artistName, accessToken),
       ])
         .then(([artistTracks, appearanceTracks]) => {
           // Combine both track arrays (assume they need to be merged)
@@ -387,11 +387,11 @@ export const getAllAlbums = () => {
       console.log('%c--- plex - getAllAlbums ---', 'color:#f9743b;');
       getAllAlbumsRunning = true;
       const accessToken = store.getState().sessionModel.currentServer.accessToken;
-      const plexBaseUrl = store.getState().appModel.plexBaseUrl;
+      const serverBaseUrl = store.getState().appModel.serverBaseUrl;
       const { libraryId } = store.getState().sessionModel.currentLibrary;
 
       plexTools
-        .getAllAlbums(plexBaseUrl, libraryId, accessToken)
+        .getAllAlbums(serverBaseUrl, libraryId, accessToken)
         .then((response) => {
           // console.log(response);
           store.dispatch.appModel.setAppState({
@@ -422,10 +422,10 @@ export const getAlbumDetails = (libraryId, albumId, callback) => {
       console.log('%c--- plex - getAlbumDetails ---', 'color:#f9743b;');
       getAlbumDetailsRunning = true;
       const accessToken = store.getState().sessionModel.currentServer.accessToken;
-      const plexBaseUrl = store.getState().appModel.plexBaseUrl;
+      const serverBaseUrl = store.getState().appModel.serverBaseUrl;
 
       plexTools
-        .getAlbumDetails(plexBaseUrl, libraryId, albumId, accessToken)
+        .getAlbumDetails(serverBaseUrl, libraryId, albumId, accessToken)
         .then((response) => {
           // console.log(response);
           store.dispatch.appModel.storeAlbumDetails(response);
@@ -457,10 +457,10 @@ export const getAlbumTracks = (libraryId, albumId) => {
         console.log('%c--- plex - getAlbumTracks ---', 'color:#f9743b;');
         getAlbumTracksRunning = true;
         const accessToken = store.getState().sessionModel.currentServer.accessToken;
-        const plexBaseUrl = store.getState().appModel.plexBaseUrl;
+        const serverBaseUrl = store.getState().appModel.serverBaseUrl;
 
         plexTools
-          .getAlbumTracks(plexBaseUrl, libraryId, albumId, accessToken)
+          .getAlbumTracks(serverBaseUrl, libraryId, albumId, accessToken)
           .then((response) => {
             // console.log(response);
             store.dispatch.appModel.storeAlbumTracks({ libraryId, albumId, albumTracks: response });
@@ -497,10 +497,10 @@ export const getFolderItems = (folderId) => {
         console.log('%c--- plex - getFolderItems ---', 'color:#f9743b;');
         getFolderItemsRunning = true;
         const accessToken = store.getState().sessionModel.currentServer.accessToken;
-        const plexBaseUrl = store.getState().appModel.plexBaseUrl;
+        const serverBaseUrl = store.getState().appModel.serverBaseUrl;
 
         plexTools
-          .getFolderItems(plexBaseUrl, libraryId, folderId, accessToken)
+          .getFolderItems(serverBaseUrl, libraryId, folderId, accessToken)
           .then((response) => {
             // console.log(response);
             store.dispatch.appModel.storeFolderItems({ libraryId, folderId, folderItems: response });
@@ -535,11 +535,11 @@ export const getAllPlaylists = () => {
       console.log('%c--- plex - getAllPlaylists ---', 'color:#f9743b;');
       getAllPlaylistsRunning = true;
       const accessToken = store.getState().sessionModel.currentServer.accessToken;
-      const plexBaseUrl = store.getState().appModel.plexBaseUrl;
+      const serverBaseUrl = store.getState().appModel.serverBaseUrl;
       const { libraryId } = store.getState().sessionModel.currentLibrary;
 
       plexTools
-        .getAllPlaylists(plexBaseUrl, libraryId, accessToken)
+        .getAllPlaylists(serverBaseUrl, libraryId, accessToken)
         .then((response) => {
           // console.log(response);
           store.dispatch.appModel.setAppState({ allPlaylists: response });
@@ -569,10 +569,10 @@ export const getPlaylistDetails = (libraryId, playlistId) => {
       console.log('%c--- plex - getPlaylistDetails ---', 'color:#f9743b;');
       getPlaylistDetailsRunning = true;
       const accessToken = store.getState().sessionModel.currentServer.accessToken;
-      const plexBaseUrl = store.getState().appModel.plexBaseUrl;
+      const serverBaseUrl = store.getState().appModel.serverBaseUrl;
 
       plexTools
-        .getPlaylistDetails(plexBaseUrl, libraryId, playlistId, accessToken)
+        .getPlaylistDetails(serverBaseUrl, libraryId, playlistId, accessToken)
         .then((response) => {
           // console.log(response);
           store.dispatch.appModel.storePlaylistDetails(response);
@@ -601,10 +601,10 @@ export const getPlaylistTracks = (libraryId, playlistId) => {
         console.log('%c--- plex - getPlaylistTracks ---', 'color:#f9743b;');
         getPlaylistTracksRunning = true;
         const accessToken = store.getState().sessionModel.currentServer.accessToken;
-        const plexBaseUrl = store.getState().appModel.plexBaseUrl;
+        const serverBaseUrl = store.getState().appModel.serverBaseUrl;
 
         plexTools
-          .getPlaylistTracks(plexBaseUrl, libraryId, playlistId, accessToken)
+          .getPlaylistTracks(serverBaseUrl, libraryId, playlistId, accessToken)
           .then((response) => {
             // console.log(response);
             store.dispatch.appModel.storePlaylistTracks({ libraryId, playlistId, playlistTracks: response });
@@ -640,11 +640,11 @@ export const getAllCollections = () => {
       console.log('%c--- plex - getAllCollections ---', 'color:#f9743b;');
       getAllCollectionsRunning = true;
       const accessToken = store.getState().sessionModel.currentServer.accessToken;
-      const plexBaseUrl = store.getState().appModel.plexBaseUrl;
+      const serverBaseUrl = store.getState().appModel.serverBaseUrl;
       const { libraryId } = store.getState().sessionModel.currentLibrary;
 
       plexTools
-        .getAllCollections(plexBaseUrl, libraryId, accessToken)
+        .getAllCollections(serverBaseUrl, libraryId, accessToken)
         .then((response) => {
           // console.log(response);
           store.dispatch.appModel.setAppState(response);
@@ -676,10 +676,10 @@ export const getCollectionItems = (libraryId, collectionId, typeKey) => {
       console.log('%c--- plex - getCollectionItems - ' + typeKey + ' ---', 'color:#f9743b;');
       getCollectionItemsRunning[typeKey] = true;
       const accessToken = store.getState().sessionModel.currentServer.accessToken;
-      const plexBaseUrl = store.getState().appModel.plexBaseUrl;
+      const serverBaseUrl = store.getState().appModel.serverBaseUrl;
 
       plexTools
-        .getCollectionItems(plexBaseUrl, libraryId, collectionId, typeKey, accessToken)
+        .getCollectionItems(serverBaseUrl, libraryId, collectionId, typeKey, accessToken)
         .then((response) => {
           // console.log(response);
           store.dispatch.appModel[`store${typeKey}CollectionItems`]({
@@ -718,11 +718,11 @@ export const getAllTags = (typeKey) => {
       console.log('%c--- plex - getAllTags - ' + typeKey + ' ---', 'color:#f9743b;');
       getAllTagsRunning[typeKey] = true;
       const accessToken = store.getState().sessionModel.currentServer.accessToken;
-      const plexBaseUrl = store.getState().appModel.plexBaseUrl;
+      const serverBaseUrl = store.getState().appModel.serverBaseUrl;
       const { libraryId } = store.getState().sessionModel.currentLibrary;
 
       plexTools
-        .getAllTags(plexBaseUrl, libraryId, typeKey, accessToken)
+        .getAllTags(serverBaseUrl, libraryId, typeKey, accessToken)
         .then((response) => {
           // console.log(response);
           store.dispatch.appModel.setAppState({ [`all${typeKey}`]: response });
@@ -757,10 +757,10 @@ export const getTagItems = (libraryId, tagId, typeKey) => {
       console.log('%c--- plex - getTagItems ---', 'color:#f9743b;');
       getTagItemsRunning[typeKey] = true;
       const accessToken = store.getState().sessionModel.currentServer.accessToken;
-      const plexBaseUrl = store.getState().appModel.plexBaseUrl;
+      const serverBaseUrl = store.getState().appModel.serverBaseUrl;
 
       plexTools
-        .getTagItems(plexBaseUrl, libraryId, tagId, typeKey, accessToken)
+        .getTagItems(serverBaseUrl, libraryId, tagId, typeKey, accessToken)
         .then((response) => {
           // console.log(response);
           store.dispatch.appModel[`store${typeKey}`]({ libraryId, tagId, tagItems: response });
@@ -788,11 +788,11 @@ export const searchLibrary = (query) => {
 
 const searchLibrary2 = (query, searchCounter) => {
   const accessToken = store.getState().sessionModel.currentServer.accessToken;
-  const plexBaseUrl = store.getState().appModel.plexBaseUrl;
+  const serverBaseUrl = store.getState().appModel.serverBaseUrl;
   const { libraryId } = store.getState().sessionModel.currentLibrary;
 
   plexTools
-    .searchHub(plexBaseUrl, libraryId, accessToken, query)
+    .searchHub(serverBaseUrl, libraryId, accessToken, query)
     .then((response) => {
       // console.log(response);
       const searchResultCounter = store.getState().appModel.searchResultCounter;
@@ -815,11 +815,11 @@ const searchLibrary2 = (query, searchCounter) => {
 // ======================================================================
 
 export const setStarRating = (type, ratingKey, rating) => {
-  const plexBaseUrl = store.getState().appModel.plexBaseUrl;
+  const serverBaseUrl = store.getState().appModel.serverBaseUrl;
   const accessToken = store.getState().sessionModel.currentServer.accessToken;
   const sessionId = store.getState().sessionModel.sessionId;
   plexTools
-    .setStarRating(plexBaseUrl, accessToken, sessionId, ratingKey, rating)
+    .setStarRating(serverBaseUrl, accessToken, sessionId, ratingKey, rating)
     .then(() => {
       if (type === 'artist' || type === 'artists') {
         store.dispatch.appModel.setArtistRating({ ratingKey, rating });
@@ -864,12 +864,22 @@ export const logPlaybackStop = (currentTrack) => {
 export const logPlaybackStatus = (currentTrack, state, currentTime) => {
   const optionLogPlexPlayback = store.getState().sessionModel.optionLogPlexPlayback;
   if (optionLogPlexPlayback) {
-    const plexBaseUrl = store.getState().appModel.plexBaseUrl;
+    const serverBaseUrl = store.getState().appModel.serverBaseUrl;
     const accessToken = store.getState().sessionModel.currentServer.accessToken;
     const sessionId = store.getState().sessionModel.sessionId;
     const { trackId, trackKey, duration } = currentTrack || {};
     plexTools
-      .logPlaybackStatus(plexBaseUrl, accessToken, sessionId, 'music', trackId, trackKey, state, currentTime, duration)
+      .logPlaybackStatus(
+        serverBaseUrl,
+        accessToken,
+        sessionId,
+        'music',
+        trackId,
+        trackKey,
+        state,
+        currentTime,
+        duration
+      )
       .catch((error) => {
         console.error(error);
         analyticsEvent('Error: Plex Update Playback Status');
@@ -880,12 +890,12 @@ export const logPlaybackStatus = (currentTrack, state, currentTime) => {
 export const logPlaybackQuit = (currentTrack, currentTime) => {
   const optionLogPlexPlayback = store.getState().sessionModel.optionLogPlexPlayback;
   if (optionLogPlexPlayback) {
-    const plexBaseUrl = store.getState().appModel.plexBaseUrl;
+    const serverBaseUrl = store.getState().appModel.serverBaseUrl;
     const accessToken = store.getState().sessionModel.currentServer.accessToken;
     const sessionId = store.getState().sessionModel.sessionId;
     const { trackId, trackKey, duration } = currentTrack || {};
     plexTools.logPlaybackQuit(
-      plexBaseUrl,
+      serverBaseUrl,
       accessToken,
       sessionId,
       'music',
