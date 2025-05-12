@@ -1,5 +1,5 @@
 /*
-We are transposing the Plex data to a format that is easier to work with in the app and
+We are transposing the API data to a format that is easier to work with in the app and
 consistent between music services, and also doing some additional processing and validation.
 */
 
@@ -21,7 +21,7 @@ const thumbSizeMedium = 600;
 // HELPERS
 // ======================================================================
 
-const getThumb = (baseUrl, thumb, size, accessToken) => {
+const getThumb = (thumb, baseUrl, accessToken, size) => {
   const finalThumb = thumb
     ? `${baseUrl}/photo/:/transcode?width=${size}&height=${size}&url=${encodeURIComponent(
         thumb.split('?')[0]
@@ -136,8 +136,8 @@ export const transposeArtistData = (artist, libraryId, baseUrl, accessToken) => 
     genre: artist?.Genre?.[0]?.tag,
     userRating: artist.userRating,
     link: '/artists/' + libraryId + '/' + artist.ratingKey,
-    thumb: getThumb(baseUrl, artist.thumb, thumbSizeSmall, accessToken),
-    thumbMedium: getThumb(baseUrl, artist.thumb, thumbSizeMedium, accessToken),
+    thumb: getThumb(artist.thumb, baseUrl, accessToken, thumbSizeSmall),
+    thumbMedium: getThumb(artist.thumb, baseUrl, accessToken, thumbSizeMedium),
   };
 };
 
@@ -173,8 +173,8 @@ export const transposeAlbumData = (album, libraryId, baseUrl, accessToken) => {
     userRating: album.userRating,
     releaseDate: album.originallyAvailableAt,
     link: '/albums/' + libraryId + '/' + album.ratingKey,
-    thumb: getThumb(baseUrl, album.thumb, thumbSizeSmall, accessToken),
-    thumbMedium: getThumb(baseUrl, album.thumb, thumbSizeMedium, accessToken),
+    thumb: getThumb(album.thumb, baseUrl, accessToken, thumbSizeSmall),
+    thumbMedium: getThumb(album.thumb, baseUrl, accessToken, thumbSizeMedium),
   };
 };
 
@@ -263,8 +263,8 @@ export const transposePlaylistData = (playlist, libraryId, baseUrl, accessToken)
     link: '/playlists/' + libraryId + '/' + playlist.ratingKey,
     totalTracks: playlist.leafCount,
     duration: playlist.duration,
-    thumb: getThumb(baseUrl, playlistThumb, thumbSizeSmall, accessToken),
-    thumbMedium: getThumb(baseUrl, playlistThumb, thumbSizeMedium, accessToken),
+    thumb: getThumb(playlistThumb, baseUrl, accessToken, thumbSizeSmall),
+    thumbMedium: getThumb(playlistThumb, baseUrl, accessToken, thumbSizeMedium),
   };
 };
 
@@ -308,8 +308,8 @@ export const transposeCollectionData = (collection, libraryId, baseUrl, accessTo
       libraryId +
       '/' +
       collection.ratingKey,
-    thumb: getThumb(baseUrl, collectionThumb, thumbSizeSmall, accessToken),
-    thumbMedium: getThumb(baseUrl, collectionThumb, thumbSizeMedium, accessToken),
+    thumb: getThumb(collectionThumb, baseUrl, accessToken, thumbSizeSmall),
+    thumbMedium: getThumb(collectionThumb, baseUrl, accessToken, thumbSizeMedium),
   };
 };
 
@@ -420,8 +420,8 @@ export const transposeTrackData = (track, libraryId, baseUrl, accessToken) => {
     duration: track.Media[0].duration,
     userRating: track.userRating,
     releaseDate: track.parentYear ? track.parentYear + '-01-01' : null,
-    thumb: getThumb(baseUrl, track.thumb, thumbSizeSmall, accessToken),
-    thumbMedium: getThumb(baseUrl, track.thumb, thumbSizeMedium, accessToken),
+    thumb: getThumb(track.thumb, baseUrl, accessToken, thumbSizeSmall),
+    thumbMedium: getThumb(track.thumb, baseUrl, accessToken, thumbSizeMedium),
     src: `${baseUrl}${track.Media[0].Part[0].key}?X-Plex-Token=${accessToken}`,
   };
 };
@@ -466,7 +466,7 @@ export const transposeHubSearchResultData = (result, libraryId, baseUrl, accessT
         icon: 'PeopleIcon',
         title: result.title,
         link: '/artists/' + libraryId + '/' + result.ratingKey,
-        thumb: getThumb(baseUrl, result.thumb, thumbSizeSmall, accessToken),
+        thumb: getThumb(result.thumb, baseUrl, accessToken, thumbSizeSmall),
       };
     } else if (result.type === 'album') {
       return {
@@ -476,8 +476,7 @@ export const transposeHubSearchResultData = (result, libraryId, baseUrl, accessT
         icon: 'PlayCircleIcon',
         title: result.title,
         link: '/albums/' + libraryId + '/' + result.ratingKey,
-
-        thumb: getThumb(baseUrl, result.thumb, thumbSizeSmall, accessToken),
+        thumb: getThumb(result.thumb, baseUrl, accessToken, thumbSizeSmall),
       };
     } else if (result.type === 'playlist') {
       const playlistThumb = result.thumb ? result.thumb : result.composite ? result.composite : null;
@@ -488,7 +487,7 @@ export const transposeHubSearchResultData = (result, libraryId, baseUrl, accessT
         icon: 'PlaylistIcon',
         title: result.title,
         link: '/playlists/' + libraryId + '/' + result.ratingKey,
-        thumb: getThumb(baseUrl, playlistThumb, thumbSizeSmall, accessToken),
+        thumb: getThumb(playlistThumb, baseUrl, accessToken, thumbSizeSmall),
       };
     } else if (result.type === 'collection') {
       const collectionThumb = result.thumb ? result.thumb : result.composite ? result.composite : null;
@@ -503,7 +502,7 @@ export const transposeHubSearchResultData = (result, libraryId, baseUrl, accessT
           libraryId +
           '/' +
           result.ratingKey,
-        thumb: getThumb(baseUrl, collectionThumb, thumbSizeSmall, accessToken),
+        thumb: getThumb(collectionThumb, baseUrl, accessToken, thumbSizeSmall),
       };
     } else if (result.type === 'track') {
       return {
@@ -513,8 +512,7 @@ export const transposeHubSearchResultData = (result, libraryId, baseUrl, accessT
         icon: 'MusicNoteSingleIcon',
         title: result.title,
         link: '/albums/' + libraryId + '/' + result.parentRatingKey,
-
-        thumb: getThumb(baseUrl, result.thumb, thumbSizeSmall, accessToken),
+        thumb: getThumb(result.thumb, baseUrl, accessToken, thumbSizeSmall),
       };
     }
   }
