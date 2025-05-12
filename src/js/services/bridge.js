@@ -11,7 +11,7 @@ import store from 'js/store/store';
 // ======================================================================
 
 export const init = () => {
-  console.log('%c--- plex - init ---', 'color:#f9743b;');
+  console.log('%c--- bridge - init ---', 'color:#f9743b;');
   plexTools
     .init()
     .then((_response) => {
@@ -37,7 +37,7 @@ export const init = () => {
 // ======================================================================
 
 export const login = () => {
-  console.log('%c--- plex - login ---', 'color:#f9743b;');
+  console.log('%c--- bridge - login ---', 'color:#f9743b;');
   plexTools
     .login()
     .then((_response) => {
@@ -55,7 +55,7 @@ export const login = () => {
 // ======================================================================
 
 export const logout = () => {
-  console.log('%c--- plex - logout ---', 'color:#f9743b;');
+  console.log('%c--- bridge - logout ---', 'color:#f9743b;');
   plexTools.logout();
   store.dispatch.appModel.setLoggedOut();
   analyticsEvent('Plex: Logout');
@@ -66,7 +66,7 @@ export const logout = () => {
 // ======================================================================
 
 export const getUserInfo = () => {
-  console.log('%c--- plex - getUserInfo ---', 'color:#f9743b;');
+  console.log('%c--- bridge - getUserInfo ---', 'color:#f9743b;');
   plexTools
     .getUserInfo()
     .then((response) => {
@@ -89,7 +89,7 @@ export const getAllServers = () => {
   if (!getUserServersRunning) {
     const prevAllResources = store.getState().appModel.allServers;
     if (!prevAllResources) {
-      console.log('%c--- plex - getAllServers ---', 'color:#f9743b;');
+      console.log('%c--- bridge - getAllServers ---', 'color:#f9743b;');
       getUserServersRunning = true;
       plexTools
         .getAllServers()
@@ -140,7 +140,7 @@ export const getAllLibraries = async () => {
     if (!prevAllLibraries) {
       const currentServer = store.getState().sessionModel.currentServer;
       if (currentServer) {
-        console.log('%c--- plex - getAllLibraries ---', 'color:#f9743b;');
+        console.log('%c--- bridge - getAllLibraries ---', 'color:#f9743b;');
         getUserLibrariesRunning = true;
 
         // before getting libraries, get the fastest server connection
@@ -182,7 +182,7 @@ export const getAllArtists = () => {
   if (!getAllArtistsRunning) {
     const haveGotAllArtists = store.getState().appModel.haveGotAllArtists;
     if (!haveGotAllArtists) {
-      console.log('%c--- plex - getAllArtists ---', 'color:#f9743b;');
+      console.log('%c--- bridge - getAllArtists ---', 'color:#f9743b;');
       getAllArtistsRunning = true;
       const accessToken = store.getState().sessionModel.currentServer.accessToken;
       const serverBaseUrl = store.getState().appModel.serverBaseUrl;
@@ -217,7 +217,7 @@ export const getArtistDetails = (libraryId, artistId) => {
   if (!getArtistDetailsRunning) {
     const prevArtistDetails = store.getState().appModel.allArtists?.find((artist) => artist.artistId === artistId);
     if (!prevArtistDetails) {
-      console.log('%c--- plex - getArtistDetails ---', 'color:#f9743b;');
+      console.log('%c--- bridge - getArtistDetails ---', 'color:#f9743b;');
       getArtistDetailsRunning = true;
       const accessToken = store.getState().sessionModel.currentServer.accessToken;
       const serverBaseUrl = store.getState().appModel.serverBaseUrl;
@@ -248,7 +248,7 @@ export const getAllArtistAlbums = (libraryId, artistId) => {
   if (!getAllArtistAlbumsRunning) {
     const prevAllAlbums = store.getState().appModel.allArtistAlbums[libraryId + '-' + artistId];
     if (!prevAllAlbums) {
-      console.log('%c--- plex - getAllArtistAlbums ---', 'color:#f9743b;');
+      console.log('%c--- bridge - getAllArtistAlbums ---', 'color:#f9743b;');
       getAllArtistAlbumsRunning = true;
       const accessToken = store.getState().sessionModel.currentServer.accessToken;
       const serverBaseUrl = store.getState().appModel.serverBaseUrl;
@@ -279,7 +279,7 @@ export const getAllArtistRelated = (libraryId, artistId) => {
   if (!getAllArtistRelatedRunning) {
     const prevAllRelated = store.getState().appModel.allArtistRelated[libraryId + '-' + artistId];
     if (!prevAllRelated) {
-      console.log('%c--- plex - getAllArtistRelated ---', 'color:#f9743b;');
+      console.log('%c--- bridge - getAllArtistRelated ---', 'color:#f9743b;');
       getAllArtistRelatedRunning = true;
       const accessToken = store.getState().sessionModel.currentServer.accessToken;
       const serverBaseUrl = store.getState().appModel.serverBaseUrl;
@@ -310,7 +310,7 @@ export const getAllArtistAppearanceAlbums = (libraryId, artistId, artistName) =>
   if (!getAllArtistAppearanceAlbumsRunning) {
     const prevAllCompilationAlbums = store.getState().appModel.allArtistCompilationAlbums[libraryId + '-' + artistId];
     if (!prevAllCompilationAlbums) {
-      console.log('%c--- plex - getAllArtistAppearanceAlbums ---', 'color:#f9743b;');
+      console.log('%c--- bridge - getAllArtistAppearanceAlbums ---', 'color:#f9743b;');
       getAllArtistAppearanceAlbumsRunning = true;
       const accessToken = store.getState().sessionModel.currentServer.accessToken;
       const serverBaseUrl = store.getState().appModel.serverBaseUrl;
@@ -345,7 +345,7 @@ export const getAllArtistTracks = (libraryId, artistId, artistName) => {
   if (!getAllArtistTracksRunning) {
     const prevArtistTracks = store.getState().appModel.allArtistTracks[libraryId + '-' + artistId];
     if (!prevArtistTracks) {
-      console.log('%c--- plex - getAllArtistTracks ---', 'color:#f9743b;');
+      console.log('%c--- bridge - getAllArtistTracks ---', 'color:#f9743b;');
       getAllArtistTracksRunning = true;
       const accessToken = store.getState().sessionModel.currentServer.accessToken;
       const serverBaseUrl = store.getState().appModel.serverBaseUrl;
@@ -384,7 +384,7 @@ export const getAllAlbums = () => {
   if (!getAllAlbumsRunning) {
     const haveGotAllAlbums = store.getState().appModel.haveGotAllAlbums;
     if (!haveGotAllAlbums) {
-      console.log('%c--- plex - getAllAlbums ---', 'color:#f9743b;');
+      console.log('%c--- bridge - getAllAlbums ---', 'color:#f9743b;');
       getAllAlbumsRunning = true;
       const accessToken = store.getState().sessionModel.currentServer.accessToken;
       const serverBaseUrl = store.getState().appModel.serverBaseUrl;
@@ -419,7 +419,7 @@ export const getAlbumDetails = (libraryId, albumId, callback) => {
   if (!getAlbumDetailsRunning) {
     const prevAlbumDetails = store.getState().appModel.allAlbums?.find((album) => album.albumId === albumId);
     if (!prevAlbumDetails) {
-      console.log('%c--- plex - getAlbumDetails ---', 'color:#f9743b;');
+      console.log('%c--- bridge - getAlbumDetails ---', 'color:#f9743b;');
       getAlbumDetailsRunning = true;
       const accessToken = store.getState().sessionModel.currentServer.accessToken;
       const serverBaseUrl = store.getState().appModel.serverBaseUrl;
@@ -454,7 +454,7 @@ export const getAlbumTracks = (libraryId, albumId) => {
     if (!getAlbumTracksRunning) {
       const prevAlbumTracks = store.getState().appModel.allAlbumTracks[libraryId + '-' + albumId];
       if (!prevAlbumTracks) {
-        console.log('%c--- plex - getAlbumTracks ---', 'color:#f9743b;');
+        console.log('%c--- bridge - getAlbumTracks ---', 'color:#f9743b;');
         getAlbumTracksRunning = true;
         const accessToken = store.getState().sessionModel.currentServer.accessToken;
         const serverBaseUrl = store.getState().appModel.serverBaseUrl;
@@ -494,7 +494,7 @@ export const getFolderItems = (folderId) => {
       const { libraryId } = store.getState().sessionModel.currentLibrary;
       const prevFolderItems = store.getState().appModel.allFolderItems[libraryId + '-' + folderId];
       if (!prevFolderItems) {
-        console.log('%c--- plex - getFolderItems ---', 'color:#f9743b;');
+        console.log('%c--- bridge - getFolderItems ---', 'color:#f9743b;');
         getFolderItemsRunning = true;
         const accessToken = store.getState().sessionModel.currentServer.accessToken;
         const serverBaseUrl = store.getState().appModel.serverBaseUrl;
@@ -532,7 +532,7 @@ export const getAllPlaylists = () => {
   if (!getAllPlaylistsRunning) {
     const prevAllPlaylists = store.getState().appModel.allPlaylists;
     if (!prevAllPlaylists) {
-      console.log('%c--- plex - getAllPlaylists ---', 'color:#f9743b;');
+      console.log('%c--- bridge - getAllPlaylists ---', 'color:#f9743b;');
       getAllPlaylistsRunning = true;
       const accessToken = store.getState().sessionModel.currentServer.accessToken;
       const serverBaseUrl = store.getState().appModel.serverBaseUrl;
@@ -566,7 +566,7 @@ export const getPlaylistDetails = (libraryId, playlistId) => {
       .getState()
       .appModel.allPlaylists?.find((playlist) => playlist.playlistId === playlistId);
     if (!prevPlaylistDetails) {
-      console.log('%c--- plex - getPlaylistDetails ---', 'color:#f9743b;');
+      console.log('%c--- bridge - getPlaylistDetails ---', 'color:#f9743b;');
       getPlaylistDetailsRunning = true;
       const accessToken = store.getState().sessionModel.currentServer.accessToken;
       const serverBaseUrl = store.getState().appModel.serverBaseUrl;
@@ -598,7 +598,7 @@ export const getPlaylistTracks = (libraryId, playlistId) => {
     if (!getPlaylistTracksRunning) {
       const prevPlaylistTracks = store.getState().appModel.allPlaylistTracks[libraryId + '-' + playlistId];
       if (!prevPlaylistTracks) {
-        console.log('%c--- plex - getPlaylistTracks ---', 'color:#f9743b;');
+        console.log('%c--- bridge - getPlaylistTracks ---', 'color:#f9743b;');
         getPlaylistTracksRunning = true;
         const accessToken = store.getState().sessionModel.currentServer.accessToken;
         const serverBaseUrl = store.getState().appModel.serverBaseUrl;
@@ -637,7 +637,7 @@ export const getAllCollections = () => {
     const prevAllArtistCollections = store.getState().appModel.allArtistCollections;
     const prevAllAlbumCollections = store.getState().appModel.allAlbumCollections;
     if (!prevAllArtistCollections || !prevAllAlbumCollections) {
-      console.log('%c--- plex - getAllCollections ---', 'color:#f9743b;');
+      console.log('%c--- bridge - getAllCollections ---', 'color:#f9743b;');
       getAllCollectionsRunning = true;
       const accessToken = store.getState().sessionModel.currentServer.accessToken;
       const serverBaseUrl = store.getState().appModel.serverBaseUrl;
@@ -673,7 +673,7 @@ export const getCollectionItems = (libraryId, collectionId, typeKey) => {
     const prevCollectionItems =
       store.getState().appModel[`all${typeKey}CollectionItems`][libraryId + '-' + collectionId];
     if (!prevCollectionItems) {
-      console.log('%c--- plex - getCollectionItems - ' + typeKey + ' ---', 'color:#f9743b;');
+      console.log('%c--- bridge - getCollectionItems - ' + typeKey + ' ---', 'color:#f9743b;');
       getCollectionItemsRunning[typeKey] = true;
       const accessToken = store.getState().sessionModel.currentServer.accessToken;
       const serverBaseUrl = store.getState().appModel.serverBaseUrl;
@@ -715,7 +715,7 @@ export const getAllTags = (typeKey) => {
   if (!getAllTagsRunning[typeKey]) {
     const prevAllTags = store.getState().appModel[`all${typeKey}`];
     if (!prevAllTags) {
-      console.log('%c--- plex - getAllTags - ' + typeKey + ' ---', 'color:#f9743b;');
+      console.log('%c--- bridge - getAllTags - ' + typeKey + ' ---', 'color:#f9743b;');
       getAllTagsRunning[typeKey] = true;
       const accessToken = store.getState().sessionModel.currentServer.accessToken;
       const serverBaseUrl = store.getState().appModel.serverBaseUrl;
@@ -754,7 +754,7 @@ export const getTagItems = (libraryId, tagId, typeKey) => {
   if (!getTagItemsRunning[typeKey]) {
     const prevTagItems = store.getState().appModel[`all${typeKey}`][libraryId + '-' + tagId];
     if (!prevTagItems) {
-      console.log('%c--- plex - getTagItems ---', 'color:#f9743b;');
+      console.log('%c--- bridge - getTagItems ---', 'color:#f9743b;');
       getTagItemsRunning[typeKey] = true;
       const accessToken = store.getState().sessionModel.currentServer.accessToken;
       const serverBaseUrl = store.getState().appModel.serverBaseUrl;

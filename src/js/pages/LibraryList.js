@@ -6,7 +6,7 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { Button, ListServers, Loading, TitleBasic } from 'js/components';
-import * as plex from 'js/services/plex';
+import * as plex from 'js/services/bridge';
 
 // ======================================================================
 // COMPONENT

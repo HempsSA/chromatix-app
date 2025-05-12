@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import clsx from 'clsx';
 
 import { Icon } from 'js/components';
-import * as plex from 'js/services/plex';
+import * as plex from 'js/services/bridge';
 
 import style from './StarRating.module.scss';
 

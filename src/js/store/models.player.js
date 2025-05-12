@@ -4,7 +4,7 @@
 
 import { analyticsEvent, getTrackKeys } from 'js/utils';
 import * as playerX from 'js/services/player';
-import * as plex from 'js/services/plex';
+import * as plex from 'js/services/bridge';
 
 // ======================================================================
 // STATE

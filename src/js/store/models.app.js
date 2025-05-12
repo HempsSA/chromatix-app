@@ -2,7 +2,7 @@
 // IMPORTS
 // ======================================================================
 
-import * as plex from 'js/services/plex';
+import * as plex from 'js/services/bridge';
 
 // ======================================================================
 // OPTIONS

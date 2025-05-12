@@ -2,7 +2,7 @@ import { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { durationToStringLong, sortList } from 'js/utils';
-import * as plex from 'js/services/plex';
+import * as plex from 'js/services/bridge';
 
 const useGetPlaylistDetail = ({ libraryId, playlistId }) => {
   const dispatch = useDispatch();

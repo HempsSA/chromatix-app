@@ -10,7 +10,7 @@ import * as RadixPopover from '@radix-ui/react-popover';
 import { Icon, UserMenu } from 'js/components';
 import { useKeyControl, useNavigationHistory } from 'js/hooks';
 import { electronPlatform } from 'js/utils';
-import * as plex from 'js/services/plex';
+import * as plex from 'js/services/bridge';
 
 import style from './SideBar.module.scss';
 
