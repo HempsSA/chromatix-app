@@ -129,11 +129,11 @@ export const getLocalStorage = (key) => {
 
 // STANDARD HEADERS FOR MOST REQUESTS
 
-const getRequestHeaders = (plexToken) => {
+const getRequestHeaders = (authToken) => {
   return {
     Accept: 'application/json',
     'Content-Type': 'application/json',
-    'X-Plex-Token': plexToken,
+    'X-Plex-Token': authToken,
     'X-Plex-Client-Identifier': clientId,
   };
 };
@@ -210,7 +210,7 @@ export const init = () => {
       window.history.replaceState({}, document.title, window.location.pathname);
       const pinId = getLocalStorage(storagePinKey);
       if (pinId) {
-        checkPlexPinStatus(pinId).then(resolve).catch(reject);
+        checkPinStatus(pinId).then(resolve).catch(reject);
       } else {
         reject({
           code: 'plex.init.1',
@@ -292,10 +292,10 @@ export const login = () => {
 };
 
 // ======================================================================
-// CHECK PLEX PIN STATUS
+// CHECK AUTH PIN STATUS
 // ======================================================================
 
-const checkPlexPinStatus = (pinId, retryCount = 0) => {
+const checkPinStatus = (pinId, retryCount = 0) => {
   return new Promise((resolve, reject) => {
     try {
       const endpoint = endpointConfig.auth.pinStatus(pinId);
@@ -321,10 +321,10 @@ const checkPlexPinStatus = (pinId, retryCount = 0) => {
           else {
             // limit number of retries
             if (retryCount < maxRetries) {
-              setTimeout(() => checkPlexPinStatus(pinId, retryCount + 1), 1000);
+              setTimeout(() => checkPinStatus(pinId, retryCount + 1), 1000);
             } else {
               reject({
-                code: 'plex.checkPlexPinStatus.1',
+                code: 'plex.checkPinStatus.1',
                 message: 'Failed to authorize PIN after ' + maxRetries + ' attempts',
                 error: null,
               });
@@ -333,14 +333,14 @@ const checkPlexPinStatus = (pinId, retryCount = 0) => {
         })
         .catch((error) => {
           reject({
-            code: 'plex.checkPlexPinStatus.2',
+            code: 'plex.checkPinStatus.2',
             message: 'Failed to check PIN status',
             error: error,
           });
         });
     } catch (error) {
       reject({
-        code: 'plex.checkPlexPinStatus.3',
+        code: 'plex.checkPinStatus.3',
         message: 'Failed to check PIN status',
         error: error,
       });

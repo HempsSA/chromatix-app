@@ -2,7 +2,7 @@
 // IMPORTS
 // ======================================================================
 
-import * as plex from 'js/services/bridge';
+import * as bridge from 'js/services/bridge';
 
 // ======================================================================
 // OPTIONS
@@ -127,8 +127,8 @@ const effects = (dispatch) => ({
     dispatch.playerModel.playerInit();
     // initialise persistent state
     dispatch.persistentModel.init();
-    // initialise plex
-    plex.init();
+    // initialise bridge
+    bridge.init();
   },
 
   //
@@ -137,13 +137,13 @@ const effects = (dispatch) => ({
 
   doLogin(payload, rootState) {
     console.log('%c--- login ---', 'color:#07a098');
-    plex.login();
+    bridge.login();
   },
 
   doLogout(payload, rootState) {
     console.log('%c--- logout ---', 'color:#07a098');
     dispatch.playerModel.playerLogQuit();
-    plex.logout();
+    bridge.logout();
     rootState.appModel.history.replace('/');
   },
 
@@ -156,7 +156,7 @@ const effects = (dispatch) => ({
     });
     dispatch.sessionModel.loadLocalStorage();
     dispatch.playerModel.playerRefresh();
-    plex.getAllServers();
+    bridge.getAllServers();
   },
 
   setLoggedOut(payload, rootState) {
@@ -172,7 +172,7 @@ const effects = (dispatch) => ({
   },
 
   //
-  // PLEX ERROR HANDLING
+  // ERROR HANDLING
   //
 
   dismissErrorPlexFastestConnection(payload, rootState) {
@@ -207,7 +207,7 @@ const effects = (dispatch) => ({
     dispatch.appModel.setAppState({
       errorPlexServers: false,
     });
-    plex.getAllServers();
+    bridge.getAllServers();
   },
 
   dismissErrorPlexUser(payload, rootState) {
@@ -215,11 +215,11 @@ const effects = (dispatch) => ({
     dispatch.appModel.setAppState({
       errorPlexUser: false,
     });
-    plex.getUserInfo();
+    bridge.getUserInfo();
   },
 
   //
-  // PLEX SERVERS & LIBRARIES
+  // SERVERS & LIBRARY HANDLING
   //
 
   clearServerState(payload, rootState) {
@@ -237,7 +237,7 @@ const effects = (dispatch) => ({
       ...Object.assign({}, libraryState),
     });
     rootState.appModel.history.push('/');
-    plex.getAllPlaylists();
+    bridge.getAllPlaylists();
   },
 
   storeAllServers(payload, rootState) {
@@ -246,7 +246,7 @@ const effects = (dispatch) => ({
       allServers: payload,
     });
     dispatch.sessionModel.refreshCurrentServer(payload);
-    plex.getAllLibraries();
+    bridge.getAllLibraries();
   },
 
   storeAllLibraries(payload, rootState) {
@@ -258,7 +258,7 @@ const effects = (dispatch) => ({
   },
 
   //
-  // PLEX - ARTISTS
+  // MUSIC - ARTISTS
   //
 
   storeArtistDetails(payload, rootState) {
@@ -417,7 +417,7 @@ const effects = (dispatch) => ({
   },
 
   //
-  // PLEX - ALBUMS
+  // MUSIC - ALBUMS
   //
 
   storeAlbumDetails(payload, rootState) {
@@ -571,7 +571,7 @@ const effects = (dispatch) => ({
   },
 
   //
-  // PLEX - FOLDERS
+  // MUSIC - FOLDERS
   //
 
   storeFolderItems(payload, rootState) {
@@ -591,7 +591,7 @@ const effects = (dispatch) => ({
   },
 
   //
-  // PLEX - PLAYLISTS
+  // MUSIC - PLAYLISTS
   //
 
   storePlaylistDetails(payload, rootState) {
@@ -644,7 +644,7 @@ const effects = (dispatch) => ({
   },
 
   //
-  // PLEX - TRACKS
+  // MUSIC - TRACKS
   //
 
   setTrackRating(payload, rootState) {
@@ -694,7 +694,7 @@ const effects = (dispatch) => ({
   },
 
   //
-  // PLEX - COLLECTIONS
+  // MUSIC - COLLECTIONS
   //
 
   storeArtistCollectionItems(payload, rootState) {
@@ -757,7 +757,7 @@ const effects = (dispatch) => ({
   },
 
   //
-  // PLEX - GENRES
+  // MUSIC - GENRES
   //
 
   storeArtistGenreItems(payload, rootState) {
@@ -793,7 +793,7 @@ const effects = (dispatch) => ({
   },
 
   //
-  // PLEX - MOODS
+  // MUSIC - MOODS
   //
 
   storeArtistMoodItems(payload, rootState) {
@@ -829,7 +829,7 @@ const effects = (dispatch) => ({
   },
 
   //
-  // PLEX - STYLES
+  // MUSIC - STYLES
   //
 
   storeArtistStyleItems(payload, rootState) {

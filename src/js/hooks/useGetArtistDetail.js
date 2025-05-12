@@ -2,7 +2,7 @@ import { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { sortList } from 'js/utils';
-import * as plex from 'js/services/bridge';
+import * as bridge from 'js/services/bridge';
 
 const useGetArtistDetail = ({ libraryId, artistId }) => {
   const dispatch = useDispatch();
@@ -197,12 +197,12 @@ const useGetArtistDetail = ({ libraryId, artistId }) => {
 
   // Get the required artist data
   useEffect(() => {
-    // plex.getAllArtists();
+    // bridge.getAllArtists();
     if (!artistInfo) {
-      plex.getArtistDetails(libraryId, artistId);
+      bridge.getArtistDetails(libraryId, artistId);
     }
-    plex.getAllArtistAlbums(libraryId, artistId);
-    plex.getAllArtistRelated(libraryId, artistId);
+    bridge.getAllArtistAlbums(libraryId, artistId);
+    bridge.getAllArtistRelated(libraryId, artistId);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [libraryId, artistId]);
@@ -210,7 +210,7 @@ const useGetArtistDetail = ({ libraryId, artistId }) => {
   // Fallback in case artist data is not included in the allArtists array
   useEffect(() => {
     if (allArtists && !artistInfo) {
-      plex.getArtistDetails(libraryId, artistId);
+      bridge.getArtistDetails(libraryId, artistId);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [allArtists, artistInfo]);
@@ -218,14 +218,14 @@ const useGetArtistDetail = ({ libraryId, artistId }) => {
   // Get the artist compilation albums
   useEffect(() => {
     if (libraryId && artistId && artistName) {
-      plex.getAllArtistAppearanceAlbums(libraryId, artistId, artistName);
+      bridge.getAllArtistAppearanceAlbums(libraryId, artistId, artistName);
     }
   }, [libraryId, artistId, artistName]);
 
   // Get the artist tracks
   useEffect(() => {
     if (viewArtistAlbums === 'track' && libraryId && artistId && artistName) {
-      plex.getAllArtistTracks(libraryId, artistId, artistName);
+      bridge.getAllArtistTracks(libraryId, artistId, artistName);
     }
   }, [libraryId, artistId, artistName, viewArtistAlbums]);
 

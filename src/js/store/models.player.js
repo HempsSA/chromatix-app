@@ -4,7 +4,7 @@
 
 import { analyticsEvent, getTrackKeys } from 'js/utils';
 import * as playerX from 'js/services/player';
-import * as plex from 'js/services/bridge';
+import * as bridge from 'js/services/bridge';
 
 // ======================================================================
 // STATE
@@ -116,7 +116,7 @@ const effects = (dispatch) => ({
       const playingTrackKeys = rootState.sessionModel.playingTrackKeys;
       const playingTrackProgress = rootState.sessionModel.playingTrackProgress;
       const currentTrack = playingTrackList[playingTrackKeys[playingTrackIndex]];
-      plex.logPlaybackQuit(currentTrack, playingTrackProgress);
+      bridge.logPlaybackQuit(currentTrack, playingTrackProgress);
     } catch (error) {
       // do nothing
     }
@@ -185,7 +185,7 @@ const effects = (dispatch) => ({
 
     // handle playing an artist before tracks are loaded
     if (!currentArtistTracks) {
-      await plex.getAllArtistTracks(libraryId, artistId, artistName);
+      await bridge.getAllArtistTracks(libraryId, artistId, artistName);
       dispatch.playerModel.playerLoadArtist(payload);
       return;
     }
@@ -211,7 +211,7 @@ const effects = (dispatch) => ({
       playingShuffle: isShuffle,
     });
 
-    analyticsEvent('Plex: Play (Artist)');
+    analyticsEvent('Music: Play (Artist)');
   },
 
   async playerLoadAlbum(payload, rootState) {
@@ -224,7 +224,7 @@ const effects = (dispatch) => ({
 
     // handle playing an album before tracks are loaded
     if (!currentAlbumTracks) {
-      await plex.getAlbumTracks(libraryId, albumId);
+      await bridge.getAlbumTracks(libraryId, albumId);
       dispatch.playerModel.playerLoadAlbum(payload);
       return;
     }
@@ -250,7 +250,7 @@ const effects = (dispatch) => ({
       playingShuffle: isShuffle,
     });
 
-    analyticsEvent('Plex: Play (Album)');
+    analyticsEvent('Music: Play (Album)');
   },
 
   async playerLoadPlaylist(payload, rootState) {
@@ -263,7 +263,7 @@ const effects = (dispatch) => ({
 
     // handle playing a playlist before tracks are loaded
     if (!currentPlaylistTracks) {
-      await plex.getPlaylistTracks(libraryId, playlistId);
+      await bridge.getPlaylistTracks(libraryId, playlistId);
       dispatch.playerModel.playerLoadPlaylist(payload);
       return;
     }
@@ -289,7 +289,7 @@ const effects = (dispatch) => ({
       playingShuffle: isShuffle,
     });
 
-    analyticsEvent('Plex: Play (Playlist)');
+    analyticsEvent('Music: Play (Playlist)');
   },
 
   async playerLoadFolder(payload, rootState) {
@@ -302,7 +302,7 @@ const effects = (dispatch) => ({
 
     // handle playing a folder before tracks are loaded
     if (!currentFolderItems) {
-      await plex.getFolderItems(folderId);
+      await bridge.getFolderItems(folderId);
       dispatch.playerModel.playerLoadFolder(payload);
       return;
     }
@@ -328,7 +328,7 @@ const effects = (dispatch) => ({
       playingShuffle: isShuffle,
     });
 
-    analyticsEvent('Plex: Play (Folder)');
+    analyticsEvent('Music: Play (Folder)');
   },
 
   playerLoadTrackList(payload, rootState) {
@@ -345,8 +345,8 @@ const effects = (dispatch) => ({
     dispatch.playerModel.setPlayerState({
       playerInteractionCount: rootState.playerModel.playerInteractionCount + 1,
     });
-    // log playback to plex server
-    plex.logPlaybackPlay(currentTrack);
+    // log playback to server
+    bridge.logPlaybackPlay(currentTrack);
     // disable repeat once
     const disableRepeatOnceOnSourceChange = rootState.sessionModel.disableRepeatOnceOnSourceChange;
     if (disableRepeatOnceOnSourceChange) {
@@ -371,10 +371,10 @@ const effects = (dispatch) => ({
           playingTrackIndex: index,
         });
         playerX.loadTrack(currentTrack.src, progress, play);
-        // log playback to plex server
+        // log playback to server
         if (play) {
-          plex.logPlaybackPlay(currentTrack, progress);
-          analyticsEvent('Plex: Play (Track)');
+          bridge.logPlaybackPlay(currentTrack, progress);
+          analyticsEvent('Music: Play (Track)');
         }
         // disable repeat once
         if (playingTrackIndex !== index && disableRepeatOnceOnTrackChange) {
@@ -402,8 +402,8 @@ const effects = (dispatch) => ({
     dispatch.playerModel.setPlayerState({
       playerPlaying: true,
     });
-    plex.logPlaybackPlay(currentTrack, playingTrackProgress);
-    analyticsEvent('Plex: Play (Resume)');
+    bridge.logPlaybackPlay(currentTrack, playingTrackProgress);
+    analyticsEvent('Music: Play (Resume)');
   },
 
   playerProgress(payload, rootState) {
@@ -415,7 +415,7 @@ const effects = (dispatch) => ({
       const playingTrackList = rootState.sessionModel.playingTrackList;
       const currentTrack = playingTrackList[playingTrackKeys[playingTrackIndex]];
       dispatch.sessionModel.setPlayingTrackProgress(payload);
-      plex.logPlaybackProgress(currentTrack, payload);
+      bridge.logPlaybackProgress(currentTrack, payload);
     }
   },
 
@@ -430,8 +430,8 @@ const effects = (dispatch) => ({
     dispatch.playerModel.setPlayerState({
       playerPlaying: false,
     });
-    plex.logPlaybackPause(currentTrack, playingTrackProgress);
-    analyticsEvent('Plex: Pause');
+    bridge.logPlaybackPause(currentTrack, playingTrackProgress);
+    analyticsEvent('Music: Pause');
   },
 
   playerRestart(payload, rootState) {
@@ -452,17 +452,17 @@ const effects = (dispatch) => ({
     // play previous track, if available
     if (playingTrackIndex > 0 && currentTime <= 5) {
       dispatch.playerModel.playerLoadIndex({ index: playingTrackIndex - 1, play: true });
-      analyticsEvent('Plex: Previous Track');
+      analyticsEvent('Music: Previous Track');
     }
     // else play last track, if on repeat
     else if (playingRepeatAll && currentTime <= 5) {
       dispatch.playerModel.playerLoadIndex({ index: playingTrackCount - 1, play: true });
-      analyticsEvent('Plex: Previous Track');
+      analyticsEvent('Music: Previous Track');
     }
     // else restart current track
     else {
       dispatch.playerModel.playerRestart();
-      analyticsEvent('Plex: Restart Track');
+      analyticsEvent('Music: Restart Track');
     }
   },
 
@@ -479,30 +479,30 @@ const effects = (dispatch) => ({
     // repeat current track, if on repeat once
     if (playingRepeatOnce && payload === true) {
       dispatch.playerModel.playerLoadIndex({ index: playingTrackIndex, play: true });
-      analyticsEvent('Plex: Next Track (Repeat Once) (Auto)');
+      analyticsEvent('Music: Next Track (Repeat Once) (Auto)');
     } else {
       // play next track, if available
       if (playingTrackIndex < playingTrackCount - 1) {
         dispatch.playerModel.playerLoadIndex({ index: playingTrackIndex + 1, play: true });
         if (payload === true) {
-          analyticsEvent('Plex: Next Track (Auto)');
+          analyticsEvent('Music: Next Track (Auto)');
         } else {
-          analyticsEvent('Plex: Next Track');
+          analyticsEvent('Music: Next Track');
         }
       }
       // else play first track, if on repeat all
       else if (playingRepeatAll) {
         dispatch.playerModel.playerLoadIndex({ index: 0, play: true });
         if (payload === true) {
-          analyticsEvent('Plex: Next Track (Restart) (Auto)');
+          analyticsEvent('Music: Next Track (Restart) (Auto)');
         } else {
-          analyticsEvent('Plex: Next Track (Restart)');
+          analyticsEvent('Music: Next Track (Restart)');
         }
       }
       // else load first track, but don't play
       else {
         dispatch.playerModel.playerLoadIndex({ index: 0, play: false });
-        plex.logPlaybackStop(currentTrack);
+        bridge.logPlaybackStop(currentTrack);
       }
     }
   },
@@ -517,21 +517,21 @@ const effects = (dispatch) => ({
         playingRepeatAll: false,
         playingRepeatOnce: true,
       });
-      analyticsEvent('Plex: Repeat Once');
+      analyticsEvent('Music: Repeat Once');
     } else if (playingRepeatOnce) {
       // repeat off
       dispatch.sessionModel.setSessionState({
         playingRepeatAll: false,
         playingRepeatOnce: false,
       });
-      analyticsEvent('Plex: Repeat Off');
+      analyticsEvent('Music: Repeat Off');
     } else {
       // repeat all
       dispatch.sessionModel.setSessionState({
         playingRepeatAll: true,
         playingRepeatOnce: false,
       });
-      analyticsEvent('Plex: Repeat All');
+      analyticsEvent('Music: Repeat All');
     }
   },
 
@@ -544,7 +544,7 @@ const effects = (dispatch) => ({
         playingRepeatAll: revertRepeatOnceToRepeatAll,
         playingRepeatOnce: false,
       });
-      analyticsEvent('Plex: Repeat All');
+      analyticsEvent('Music: Repeat All');
     }
   },
 
@@ -565,7 +565,7 @@ const effects = (dispatch) => ({
       playingTrackIndex: newIndex,
       playingTrackKeys: trackKeys,
     });
-    analyticsEvent('Plex: Shuffle ' + (isShuffle ? 'On' : 'Off'));
+    analyticsEvent('Music: Shuffle ' + (isShuffle ? 'On' : 'Off'));
   },
 
   //
@@ -626,7 +626,7 @@ const effects = (dispatch) => ({
     });
     const actualVolume = newVolumeMuted ? 0 : newVolumeLevel;
     playerX.setVolume(actualVolume);
-    analyticsEvent('Plex: Mute ' + (newVolumeMuted ? 'On' : 'Off'));
+    analyticsEvent('Music: Mute ' + (newVolumeMuted ? 'On' : 'Off'));
   },
 });
 

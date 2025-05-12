@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { sortList } from 'js/utils';
-import * as plex from 'js/services/bridge';
+import * as bridge from 'js/services/bridge';
 
 const useGetAllPlaylists = () => {
   const dispatch = useDispatch();
@@ -65,7 +65,7 @@ const useGetAllPlaylists = () => {
   };
 
   useEffect(() => {
-    plex.getAllPlaylists();
+    bridge.getAllPlaylists();
   }, []);
 
   return {

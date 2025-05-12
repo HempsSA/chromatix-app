@@ -345,8 +345,8 @@ Refactor:
 <a name="0.5.0"></a>
 # 0.5.0 (2024-04-18)
 Refactor:
-- Lots of plex API tidying up.
-- Setup plexTools.js to handle all plex API calls.
+- Lots of Plex API tidying up.
+- Setup plexTools.js to handle all Plex API calls.
 - Improved token encryption.
 
 <!-- CHANGELOG SPLIT MARKER -->

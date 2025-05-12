@@ -22,11 +22,11 @@ export const init = () => {
       if (error?.code !== 'init.2') {
         console.error(error);
         if (error?.code === 'init.1') {
-          analyticsEvent('Error: Plex Init - No Pin ID');
-        } else if (error?.code === 'checkPlexPinStatus.2') {
-          analyticsEvent('Error: Plex Init - Pin Check Failed');
+          analyticsEvent('Error: Bridge - Init - No Pin ID');
+        } else if (error?.code === 'checkPinStatus.2') {
+          analyticsEvent('Error: Bridge - Init - Pin Check Failed');
         } else {
-          analyticsEvent('Error: Plex Init - Unknown Error');
+          analyticsEvent('Error: Bridge - Init - Unknown Error');
         }
       }
     });
@@ -41,12 +41,12 @@ export const login = () => {
   plexTools
     .login()
     .then((_response) => {
-      analyticsEvent('Plex: Login Success');
+      analyticsEvent('Bridge: Login Success');
     })
     .catch((error) => {
       console.error(error);
       store.dispatch.appModel.setAppState({ errorPlexLogin: true });
-      analyticsEvent('Plex: Login Error');
+      analyticsEvent('Bridge: Login Error');
     });
 };
 
@@ -58,7 +58,7 @@ export const logout = () => {
   console.log('%c--- bridge - logout ---', 'color:#f9743b;');
   plexTools.logout();
   store.dispatch.appModel.setLoggedOut();
-  analyticsEvent('Plex: Logout');
+  analyticsEvent('Bridge: Logout');
 };
 
 // ======================================================================
@@ -75,7 +75,7 @@ export const getUserInfo = () => {
     .catch((error) => {
       console.error(error);
       store.dispatch.appModel.setAppState({ errorPlexUser: true });
-      analyticsEvent('Error: Plex Get User Info');
+      analyticsEvent('Error: Bridge - Get User Info');
     });
 };
 
@@ -99,7 +99,7 @@ export const getAllServers = () => {
         .catch((error) => {
           console.error(error);
           store.dispatch.appModel.setAppState({ errorPlexServers: true });
-          analyticsEvent('Error: Plex Get All Servers');
+          analyticsEvent('Error: Bridge - Get All Servers');
         })
         .finally(() => {
           getUserServersRunning = false;
@@ -122,7 +122,7 @@ const getFastestConnection = async (currentServer) => {
   } catch (error) {
     console.error(error);
     store.dispatch.appModel.setAppState({ errorPlexFastestConnection: true });
-    analyticsEvent('Error: Plex Get Fastest Server Connection');
+    analyticsEvent('Error: Bridge - Get Fastest Server Connection');
     throw error;
   }
   return serverBaseUrl;
@@ -162,7 +162,7 @@ export const getAllLibraries = async () => {
           .catch((error) => {
             console.error(error);
             store.dispatch.appModel.setAppState({ errorPlexLibraries: true });
-            analyticsEvent('Error: Plex Get All Libraries');
+            analyticsEvent('Error: Bridge - Get All Libraries');
           })
           .finally(() => {
             getUserLibrariesRunning = false;
@@ -802,11 +802,11 @@ const searchLibrary2 = (query, searchCounter) => {
           searchResultCounter: searchCounter,
         });
       }
-      analyticsEvent('Plex: Search');
+      analyticsEvent('Bridge: Search');
     })
     .catch((error) => {
       console.error(error);
-      analyticsEvent('Error: Plex Search');
+      analyticsEvent('Error: Bridge - Search');
     });
 };
 
@@ -832,11 +832,11 @@ export const setStarRating = (type, ratingKey, rating) => {
       } else if (type === 'collection' || type === 'collections') {
         store.dispatch.appModel.setCollectionRating({ ratingKey, rating });
       }
-      analyticsEvent('Plex: Set Star Rating');
+      analyticsEvent('Bridge: Set Star Rating');
     })
     .catch((error) => {
       console.error(error);
-      analyticsEvent('Error: Plex Set Star Rating');
+      analyticsEvent('Error: Bridge - Set Star Rating');
     });
 };
 
@@ -882,7 +882,7 @@ export const logPlaybackStatus = (currentTrack, state, currentTime) => {
       )
       .catch((error) => {
         console.error(error);
-        analyticsEvent('Error: Plex Update Playback Status');
+        analyticsEvent('Error: Bridge - Update Playback Status');
       });
   }
 };
