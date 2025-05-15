@@ -58,7 +58,7 @@ const UserMenu = ({ variant = 'default' }) => {
                   <Icon icon="ArtistCollectionsIcon" cover stroke strokeWidth={1.4} />
                 </span>
               )}
-              {currentUser.thumb && <img src={currentUser.thumb} alt={currentUser.title} draggable="false" />}
+              {currentUser.thumb && <img src={currentUser.thumb} alt="Profile picture" draggable="false" />}
             </div>
           </RadixMenu.Trigger>
 
@@ -73,7 +73,7 @@ const UserMenu = ({ variant = 'default' }) => {
                   <RadixMenu.Group>
                     <RadixMenu.Label className={style.label}>
                       {/* Plex •  */}
-                      {currentUser.email}
+                      {currentUser.email || currentUser.username}
                     </RadixMenu.Label>
 
                     {allServers.map((server) => (
