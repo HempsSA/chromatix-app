@@ -3,9 +3,9 @@
 // ======================================================================
 
 import axios from 'axios';
-import CryptoJS from 'crypto-js';
 
 import config from 'js/_config/config';
+import { getBrowserName, getLocalStorage, raceToSuccess, setLocalStorage } from 'js/utils';
 import * as plexTranspose from 'js/services/plexTranspose';
 
 // ======================================================================
@@ -17,8 +17,8 @@ const clientId = 'chromatix.app';
 const clientIcon = 'https://chromatix.app/icon/icon-512.png';
 
 const storagePinKey = config.storagePinKey;
+const storageServiceKey = config.storageServiceKey;
 const storageTokenKey = config.storageTokenKey;
-const encryptionKey = config.encryptionKey;
 
 const redirectPath = window.location.origin;
 const redirectQuery = 'plex-login';
@@ -37,6 +37,10 @@ const searchExcludeFields = 'summary';
 const excludeElements = 'Collection,Director,Image,UltraBlurColors';
 const artistRelatedExcludeElements = 'Country,Director,Guid,Image,Location,Mood,Similar,Style,UltraBlurColors';
 
+// ======================================================================
+// ENDPOINTS
+// ======================================================================
+
 const endpointConfig = {
   auth: {
     login: () => 'https://plex.tv/api/v2/pins',
@@ -52,7 +56,6 @@ const endpointConfig = {
     getAllLibraries: (baseUrl) => `${baseUrl}/library/sections`,
   },
   search: {
-    searchHub: (baseUrl) => `${baseUrl}/hubs/search`,
     searchLibrary: (baseUrl) => `${baseUrl}/library/search`,
   },
   artist: {
@@ -109,24 +112,6 @@ const endpointConfig = {
 // HELPER FUNCTIONS
 // ======================================================================
 
-// SET AND GET ENCRYPTED LOCAL STORAGE
-
-export const setLocalStorage = (key, value) => {
-  const stringValue = String(value);
-  const encryptedValue = CryptoJS.AES.encrypt(stringValue, encryptionKey).toString();
-  window.localStorage.setItem(key, encryptedValue);
-};
-
-export const getLocalStorage = (key) => {
-  const encryptedValue = window.localStorage.getItem(key);
-  if (encryptedValue) {
-    const bytes = CryptoJS.AES.decrypt(encryptedValue, encryptionKey);
-    const decryptedValue = bytes.toString(CryptoJS.enc.Utf8);
-    return decryptedValue;
-  }
-  return null;
-};
-
 // STANDARD HEADERS FOR MOST REQUESTS
 
 const getRequestHeaders = (accessToken) => {
@@ -136,49 +121,6 @@ const getRequestHeaders = (accessToken) => {
     'X-Plex-Token': accessToken,
     'X-Plex-Client-Identifier': clientId,
   };
-};
-
-// A CUSTOM PROMISE FUNCTION THAT WAITS FOR THE FIRST RESOLVED PROMISE
-// (i.e. something in between Promise.race and Promise.allSettled)
-
-const raceToSuccess = (promises, errorMessage) => {
-  return new Promise((resolve, reject) => {
-    let count = promises.length;
-    promises.forEach((promise) => {
-      (function () {
-        promise
-          .then(resolve) // if a promise resolves, resolve the main promise
-          .catch((error) => {
-            count--; // if a promise rejects, decrease the count
-            if (count === 0) {
-              // if all promises have rejected, reject the main promise
-              reject(errorMessage || error);
-            }
-          });
-      })();
-    });
-  });
-};
-
-// A SIMPLE FUNCTION TO GET THE BROWSER NAME
-
-const getBrowserName = () => {
-  const userAgent = navigator.userAgent;
-  const browsers = [
-    { name: 'Microsoft Edge', identifier: 'Edg' },
-    { name: 'Brave', identifier: 'Brave' },
-    { name: 'Opera', identifier: ['Opera', 'OPR'] },
-    { name: 'Chrome', identifier: 'Chrome' },
-    { name: 'Chromium', identifier: 'Chromium' },
-    { name: 'Firefox', identifier: 'Firefox' },
-    { name: 'Safari', identifier: 'Safari' },
-    { name: 'Samsung Internet', identifier: 'SamsungBrowser' },
-    { name: 'Microsoft Internet Explorer', identifier: 'Trident' },
-  ];
-  const browser = browsers.find((b) =>
-    Array.isArray(b.identifier) ? b.identifier.some((id) => userAgent.includes(id)) : userAgent.includes(b.identifier)
-  );
-  return browser ? browser.name : 'Unknown';
 };
 
 // ======================================================================
@@ -195,44 +137,6 @@ export const abortAllRequests = () => {
     });
     abortControllers = [];
   }
-};
-
-// ======================================================================
-// INITIALISE
-// ======================================================================
-
-export const init = () => {
-  return new Promise((resolve, reject) => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const isPlexLoginRedirect = urlParams.get(redirectQuery);
-    // if the URL contains our redirect query param, we need to check the PIN status
-    if (isPlexLoginRedirect) {
-      window.history.replaceState({}, document.title, window.location.pathname);
-      const pinId = getLocalStorage(storagePinKey);
-      if (pinId) {
-        checkPinStatus(pinId).then(resolve).catch(reject);
-      } else {
-        reject({
-          code: 'plex.init.1',
-          message: 'No pin ID found',
-          error: null,
-        });
-      }
-    }
-    // otherwise, check if the user is already logged in
-    else {
-      const accessToken = getLocalStorage(storageTokenKey);
-      if (accessToken) {
-        resolve();
-      } else {
-        reject({
-          code: 'plex.init.2',
-          message: 'No auth token found',
-          error: null,
-        });
-      }
-    }
-  });
 };
 
 // ======================================================================
@@ -295,7 +199,30 @@ export const login = () => {
 // CHECK AUTH PIN STATUS
 // ======================================================================
 
-const checkPinStatus = (pinId, retryCount = 0) => {
+export const checkPinStatus = () => {
+  return new Promise((resolve, reject) => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const isPlexLoginRedirect = urlParams.get(redirectQuery);
+    // if the URL contains our redirect query param, we need to check the PIN status
+    if (isPlexLoginRedirect) {
+      window.history.replaceState({}, document.title, window.location.pathname);
+      const pinId = getLocalStorage(storagePinKey);
+      if (pinId) {
+        checkPinStatus2(pinId).then(resolve).catch(reject);
+      } else {
+        reject({
+          code: 'plex.checkPinStatus.1',
+          message: 'No pin ID found',
+          error: null,
+        });
+      }
+    } else {
+      resolve();
+    }
+  });
+};
+
+const checkPinStatus2 = (pinId, retryCount = 0) => {
   return new Promise((resolve, reject) => {
     try {
       const endpoint = endpointConfig.auth.pinStatus(pinId);
@@ -313,6 +240,7 @@ const checkPinStatus = (pinId, retryCount = 0) => {
 
           // if valid, store the authToken in the local storage
           if (pinStatusData.authToken) {
+            setLocalStorage(storageServiceKey, 'plex');
             setLocalStorage(storageTokenKey, pinStatusData.authToken);
             window.localStorage.removeItem(storagePinKey);
             resolve();
@@ -321,10 +249,10 @@ const checkPinStatus = (pinId, retryCount = 0) => {
           else {
             // limit number of retries
             if (retryCount < maxRetries) {
-              setTimeout(() => checkPinStatus(pinId, retryCount + 1), 1000);
+              setTimeout(() => checkPinStatus2(pinId, retryCount + 1), 1000);
             } else {
               reject({
-                code: 'plex.checkPinStatus.1',
+                code: 'plex.checkPinStatus2.1',
                 message: 'Failed to authorize PIN after ' + maxRetries + ' attempts',
                 error: null,
               });
@@ -333,14 +261,14 @@ const checkPinStatus = (pinId, retryCount = 0) => {
         })
         .catch((error) => {
           reject({
-            code: 'plex.checkPinStatus.2',
+            code: 'plex.checkPinStatus2.2',
             message: 'Failed to check PIN status',
             error: error,
           });
         });
     } catch (error) {
       reject({
-        code: 'plex.checkPinStatus.3',
+        code: 'plex.checkPinStatus2.3',
         message: 'Failed to check PIN status',
         error: error,
       });
@@ -353,6 +281,7 @@ const checkPinStatus = (pinId, retryCount = 0) => {
 // ======================================================================
 
 export const logout = () => {
+  window.localStorage.removeItem(storageServiceKey);
   window.localStorage.removeItem(storageTokenKey);
 };
 
@@ -1376,12 +1305,10 @@ export const getTagItems = (baseUrl, libraryId, tagId, typeKey, accessToken) => 
 // SEARCH
 // ======================================================================
 
-// /hubs/search?query=Epica&excludeFields=summary&limit=4&includeCollections=1&contentDirectoryID=23&includeFields=thumbBlurHash
-
-export const searchHub = (baseUrl, libraryId, accessToken, query, limit = 25, includeCollections = 1) => {
+export const searchLibrary = (baseUrl, libraryId, accessToken, query, limit = 25, includeCollections = 1) => {
   return new Promise((resolve, reject) => {
     try {
-      const endpoint = endpointConfig.search.searchHub(baseUrl);
+      const endpoint = endpointConfig.search.searchLibrary(baseUrl);
       const controller = new AbortController();
       abortControllers.push(controller);
 
@@ -1402,8 +1329,8 @@ export const searchHub = (baseUrl, libraryId, accessToken, query, limit = 25, in
         })
         .catch((error) => {
           reject({
-            code: 'plex.searchHub.1',
-            message: 'Failed to search hub: ' + error?.message,
+            code: 'plex.searchLibrary.1',
+            message: 'Error searching library: ' + error?.message,
             error: error,
           });
         })
@@ -1412,61 +1339,13 @@ export const searchHub = (baseUrl, libraryId, accessToken, query, limit = 25, in
         });
     } catch (error) {
       reject({
-        code: 'plex.searchHub.2',
-        message: 'Failed to search hub: ' + error?.message,
+        code: 'plex.searchLibrary.2',
+        message: 'Error searching library: ' + error?.message,
         error: error,
       });
     }
   });
 };
-
-// export const searchLibrary = (
-//   baseUrl,
-//   accessToken,
-//   query,
-//   limit = 100,
-//   searchTypes = 'music',
-//   includeCollections = 1
-// ) => {
-//   return new Promise((resolve, reject) => {
-//     try {
-//       const endpoint = endpointConfig.search.searchLibrary(baseUrl);
-//       const controller = new AbortController();
-//       abortControllers.push(controller);
-
-//       axios
-//         .get(endpoint, {
-//           headers: getRequestHeaders(accessToken),
-//           params: {
-//             query,
-//             limit,
-//             searchTypes,
-//             includeCollections,
-//           },
-//           signal: controller.signal,
-//         })
-//         .then((response) => {
-//           resolve(response?.data?.MediaContainer?.SearchResult);
-//         })
-//         .catch((error) => {
-//           reject({
-//             code: 'plex.searchLibrary.1',
-//             message: 'Failed to search library: ' + error?.message,
-//             error: error,
-//           });
-//         })
-//         .finally(() => {
-//           abortControllers = abortControllers.filter((ctrl) => ctrl !== controller);
-//         });
-//     } catch (error) {
-//       reject({
-//         code: 'plex.searchLibrary.2',
-//         message: 'Failed to search library: ' + error?.message,
-//         error: error,
-//       });
-//     }
-//   });
-// };
 
 // ======================================================================
 // SET STAR RATING

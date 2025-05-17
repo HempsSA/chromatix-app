@@ -15,7 +15,6 @@ import { XMLParser } from 'fast-xml-parser';
 
 const thumbSizeSmall = 360;
 const thumbSizeMedium = 600;
-// const thumbPlaceholder = '/images/artwork-placeholder.png';
 
 // ======================================================================
 // HELPERS
@@ -129,11 +128,12 @@ export const transposeArtistData = (artist, libraryId, baseUrl, accessToken) => 
     libraryId: libraryId,
     artistId: artist.ratingKey,
     title: artist.title,
+    genre: artist?.Genre?.[0]?.tag,
+    country: artist?.Country?.[0]?.tag,
     addedAt: artist.addedAt,
     lastPlayed: artist.lastViewedAt,
-    country: artist?.Country?.[0]?.tag,
-    genre: artist?.Genre?.[0]?.tag,
     userRating: artist.userRating,
+    isFavourite: false,
     link: '/artists/' + libraryId + '/' + artist.ratingKey,
     thumb: getThumb(artist.thumb, baseUrl, accessToken, thumbSizeSmall),
     thumbMedium: getThumb(artist.thumb, baseUrl, accessToken, thumbSizeMedium),
@@ -163,13 +163,14 @@ export const transposeAlbumData = (album, libraryId, baseUrl, accessToken) => {
     libraryId: libraryId,
     albumId: album.ratingKey,
     title: album.title,
-    addedAt: album.addedAt,
-    lastPlayed: album.lastViewedAt,
     artist: album.parentTitle,
     artistId: album.parentRatingKey,
     artistLink: '/artists/' + libraryId + '/' + album.parentRatingKey,
     genre: album?.Genre?.[0]?.tag,
+    addedAt: album.addedAt,
+    lastPlayed: album.lastViewedAt,
     userRating: album.userRating,
+    isFavourite: false,
     releaseDate: album.originallyAvailableAt,
     link: '/albums/' + libraryId + '/' + album.ratingKey,
     thumb: getThumb(album.thumb, baseUrl, accessToken, thumbSizeSmall),
@@ -259,6 +260,7 @@ export const transposePlaylistData = (playlist, libraryId, baseUrl, accessToken)
     addedAt: playlist.addedAt,
     lastPlayed: playlist.lastViewedAt,
     userRating: playlist.userRating,
+    isFavourite: false,
     link: '/playlists/' + libraryId + '/' + playlist.ratingKey,
     totalTracks: playlist.leafCount,
     duration: playlist.duration,
@@ -441,7 +443,7 @@ const typeOrder = {
 export const transposeSearchResultsArray = (array, libraryId, baseUrl, accessToken) => {
   const data =
     array?.data?.MediaContainer?.Hub?.flatMap((result) => result.Metadata)
-      ?.map((result) => transposeHubSearchResultData(result, libraryId, baseUrl, accessToken))
+      ?.map((result) => transposeSearchResultData(result, libraryId, baseUrl, accessToken))
       .filter((result) => result !== null)
       .sort((a, b) => {
         if (b.score === a.score) {
@@ -455,7 +457,7 @@ export const transposeSearchResultsArray = (array, libraryId, baseUrl, accessTok
   return data;
 };
 
-export const transposeHubSearchResultData = (result, libraryId, baseUrl, accessToken) => {
+export const transposeSearchResultData = (result, libraryId, baseUrl, accessToken) => {
   if (result?.type) {
     if (result.type === 'artist') {
       return {
@@ -518,93 +520,6 @@ export const transposeHubSearchResultData = (result, libraryId, baseUrl, accessT
 
   return null;
 };
-
-// export const transposeLibrarySearchData = (result, libraryId, libraryTitle, baseUrl, accessToken) => {
-//   if (result?.Metadata?.type) {
-//     const meta = result.Metadata;
-//     if (meta.librarySectionTitle !== libraryTitle) {
-//       return null;
-//     } else if (meta.type === 'artist') {
-//       return {
-//         score: result.score,
-//         type: 'artist',
-//         icon: 'PeopleIcon',
-//         title: meta.title,
-//         link: '/artists/' + libraryId + '/' + meta.ratingKey,
-//         thumb: meta.thumb
-//           ? `${baseUrl}/photo/:/transcode?width=${thumbSizeSmall}&height=${thumbSizeSmall}&url=${encodeURIComponent(
-//               meta.thumb
-//             )}&minSize=1&X-Plex-Token=${accessToken}`
-//           : thumbPlaceholder,
-//       };
-//     } else if (meta.type === 'album') {
-//       return {
-//         score: result.score,
-//         type: 'album',
-//         icon: 'PlayCircleIcon',
-//         title: meta.title,
-//         link: '/albums/' + libraryId + '/' + meta.ratingKey,
-//         thumb: meta.thumb
-//           ? `${baseUrl}/photo/:/transcode?width=${thumbSizeSmall}&height=${thumbSizeSmall}&url=${encodeURIComponent(
-//               meta.thumb
-//             )}&minSize=1&X-Plex-Token=${accessToken}`
-//           : thumbPlaceholder,
-//       };
-//     } else if (meta.type === 'playlist') {
-//       const playlistThumb = meta.thumb ? meta.thumb : meta.composite ? meta.composite : null;
-//       return {
-//         score: result.score,
-//         type: 'playlist',
-//         icon: 'MusicNoteDoubleIcon',
-//         title: meta.title,
-//         link: '/playlists/' + libraryId + '/' + meta.ratingKey,
-//         thumb: playlistThumb
-//           ? `${baseUrl}/photo/:/transcode?width=${thumbSizeSmall}&height=${thumbSizeSmall}&url=${encodeURIComponent(
-//               playlistThumb
-//             )}&minSize=1&X-Plex-Token=${accessToken}`
-//           : thumbPlaceholder,
-//       };
-//     } else if (meta.type === 'collection') {
-//       const collectionThumb = meta.thumb ? meta.thumb : meta.composite ? meta.composite : null;
-//       return {
-//         score: result.score,
-//         type: meta.subtype + ' collection',
-//         icon: meta.subtype === 'artist' ? 'ArtistCollectionsIcon' : 'AlbumCollectionsIcon',
-//         title: meta.title,
-//         link:
-//           (meta.subtype === 'artist' ? '/artist-collections/' : '/album-collections/') +
-//           libraryId +
-//           '/' +
-//           meta.ratingKey,
-//         thumb: collectionThumb
-//           ? `${baseUrl}/photo/:/transcode?width=${thumbSizeSmall}&height=${thumbSizeSmall}&url=${encodeURIComponent(
-//               collectionThumb
-//             )}&minSize=1&X-Plex-Token=${accessToken}`
-//           : thumbPlaceholder,
-//       };
-//     } else if (meta.type === 'track') {
-//       return {
-//         score: result.score,
-//         type: 'track',
-//         icon: 'MusicNoteSingleIcon',
-//         title: meta.title,
-//         link: '/albums/' + libraryId + '/' + meta.parentRatingKey,
-//         thumb: meta.thumb
-//           ? `${baseUrl}/photo/:/transcode?width=${thumbSizeSmall}&height=${thumbSizeSmall}&url=${encodeURIComponent(
-//               meta.thumb
-//             )}&minSize=1&X-Plex-Token=${accessToken}`
-//           : thumbPlaceholder,
-//       };
-//     }
-//   }
-//   // else if (result?.Directory?.type) {
-//   //   const directory = result.Directory;
-//   //   if (directory.type === 'tag') {
-//   //   }
-//   // }
-
-//   return null;
-// };
 
 // ======================================================================
 // DYNAMIC LOOKUPS

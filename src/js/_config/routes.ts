@@ -9,7 +9,12 @@ export const defaultRoutes = [
   {
     path: '/',
     exact: true,
-    component: 'Login',
+    component: 'Home',
+  },
+  {
+    path: '/login-jellyfin',
+    exact: true,
+    component: 'LoginJelly',
   },
 
   // other
@@ -26,6 +31,11 @@ export const authRoutes = [
   // index
   {
     path: '/',
+    exact: true,
+    redirect: '/artists',
+  },
+  {
+    path: '/login-jellyfin',
     exact: true,
     redirect: '/artists',
   },
