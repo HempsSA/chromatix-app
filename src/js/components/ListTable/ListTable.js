@@ -758,7 +758,7 @@ const StandardRow = ({ virtualRow, entry, tableVariant, tableOptions, gridTempla
             case 'kind':
               return (
                 <div key={rowKey + '-' + index} className={clsx(style.kind, 'text-trim')}>
-                  {entry.kind.replace('aaa', '')}
+                  {entry.kind?.replace('aaa', '')}
                 </div>
               );
 
@@ -1019,14 +1019,14 @@ const TrackRow = ({
             case 'kind':
               return (
                 <div key={rowKey + '-' + index} className={clsx(style.kind, 'text-trim')}>
-                  {entry.kind.replace('aaa', '')}
+                  {entry.kind?.replace('aaa', '')}
                 </div>
               );
 
             case 'codec':
               return (
                 <div key={rowKey + '-' + index} className={clsx(style.codec, 'text-trim')}>
-                  {entry.codec.toUpperCase()}
+                  {entry.codec?.toUpperCase()}
                 </div>
               );
 
