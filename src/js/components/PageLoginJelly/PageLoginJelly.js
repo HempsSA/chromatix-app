@@ -17,10 +17,12 @@ import style from './PageLoginJelly.module.scss';
 // COMPONENT
 // ======================================================================
 
+const isLocal = process.env.REACT_APP_ENV === 'local';
+
 export const PageLoginJelly = () => {
   const initialValues = {
-    server: 'http://192.168.1.201:8096',
-    username: 'Alex',
+    server: isLocal ? 'http://192.168.1.201:8096' : '',
+    username: isLocal ? 'Alex' : '',
     password: '',
     general: '',
   };
