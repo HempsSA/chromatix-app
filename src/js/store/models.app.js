@@ -66,7 +66,7 @@ const libraryState = {
   // artists
   allArtists: null,
   allArtistAlbums: {},
-  allArtistRelated: {},
+  allArtistRelatedAlbums: {},
   allArtistAppearanceAlbums: {},
   allArtistTracks: {},
   haveGotAllArtists: false,
@@ -320,16 +320,16 @@ const effects = (dispatch) => ({
   storeArtistRelated(payload, rootState) {
     console.log('%c--- storeArtistRelated ---', 'color:#07a098');
     const { libraryId, artistId, artistRelated } = payload;
-    const allArtistRelated = { ...rootState.appModel.allArtistRelated };
+    const allArtistRelatedAlbums = { ...rootState.appModel.allArtistRelatedAlbums };
     // limit recent entries
-    const keys = Object.keys(allArtistRelated);
+    const keys = Object.keys(allArtistRelatedAlbums);
     if (keys.length >= maxDataLength) {
-      delete allArtistRelated[keys[0]];
+      delete allArtistRelatedAlbums[keys[0]];
     }
     // add the new entry and save
-    allArtistRelated[libraryId + '-' + artistId] = artistRelated;
+    allArtistRelatedAlbums[libraryId + '-' + artistId] = artistRelated;
     dispatch.appModel.setAppState({
-      allArtistRelated,
+      allArtistRelatedAlbums,
     });
   },
 
@@ -504,10 +504,10 @@ const effects = (dispatch) => ({
     });
 
     // update artist related albums
-    const allArtistRelated = { ...rootState.appModel.allArtistRelated };
-    const artistKeys = Object.keys(allArtistRelated);
+    const allArtistRelatedAlbums = { ...rootState.appModel.allArtistRelatedAlbums };
+    const artistKeys = Object.keys(allArtistRelatedAlbums);
     artistKeys.forEach((artistKey) => {
-      const artistGroups = allArtistRelated[artistKey];
+      const artistGroups = allArtistRelatedAlbums[artistKey];
       artistGroups.forEach((group) => {
         const relatedAlbums = group.related;
         relatedAlbums.forEach((album, index) => {
@@ -516,7 +516,7 @@ const effects = (dispatch) => ({
           }
         });
       });
-      allArtistRelated[artistKey] = artistGroups;
+      allArtistRelatedAlbums[artistKey] = artistGroups;
     });
 
     // update artist appearance albums
@@ -583,7 +583,7 @@ const effects = (dispatch) => ({
     // save
     dispatch.appModel.setAppState({
       allArtistAlbums,
-      allArtistRelated,
+      allArtistRelatedAlbums,
       allAlbumCollectionItems,
       allAlbumGenreItems,
       allAlbumStyleItems,
